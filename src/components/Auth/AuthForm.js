@@ -1,18 +1,26 @@
 import { useState } from "react";
 import { useHttp } from "../../hooks/hooks";
+import { Message } from "../message/message";
 
 import classes from "./AuthForm.module.css";
-const SECRET_TOKEN_URL = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?";
+const SIGN_UP_URL = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=";
+const SIGN_IN_URL =
+  "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=";
 
 const AuthForm = () => {
-  const [createUser, { isLoading }] = useHttp({
-    url: SECRET_TOKEN_URL,
+  const [createUser, { isLoading: createUserLoading }] = useHttp({
+    url: SIGN_UP_URL,
+    method: "POST",
+  });
+  const [loginUser, { isLoading: loginLoading }] = useHttp({
+    url: SIGN_IN_URL,
     method: "POST",
   });
   const [emailValue, setEmailValue] = useState("");
   const [passValue, setPassValue] = useState("");
   const [isLogin, setIsLogin] = useState(true);
-  const [message, setMessage] = useState(false);
+  const [message, setMessage] = useState("");
+  const [wasSended, setWasSended] = useState(false);
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -23,6 +31,13 @@ const AuthForm = () => {
 
     if (isLogin) {
       console.log("login existing user by comparing email/pass");
+      loginUser({ email: emailValue, password: passValue, returnSecureToken: true }).then(
+        (response) => {
+          console.log(response);
+          setMessage(response?.message);
+          setWasSended(false);
+        }
+      );
     } else {
       console.log("creates new user");
       createUser({
@@ -31,8 +46,13 @@ const AuthForm = () => {
         returnSecureToken: true,
       }).then((errorData) => {
         setMessage(errorData?.message);
+        setWasSended(false);
       });
     }
+
+    setEmailValue("");
+    setPassValue("");
+    setWasSended(true);
   };
 
   return (
@@ -58,11 +78,15 @@ const AuthForm = () => {
             required
             onChange={(evt) => setPassValue(evt.target.value.trim())}
           />
-          {<p style={{ color: "white", marginTop: "4px" }}>{message}</p>}
+        </div>
+        <div className={classes.control}>
+          <Message MESSAGE_CODE={message} wasSended={wasSended} />
         </div>
         <div className={classes.actions}>
-          {!isLoading && <button>{isLogin ? "Login" : "Create Account"}</button>}
-          {isLoading && <p>Sending request...</p>}
+          {!createUserLoading && !loginLoading && (
+            <button>{isLogin ? "Login" : "Create Account"}</button>
+          )}
+          {(createUserLoading || loginLoading) && <p>Sending request...</p>}
           <button
             type="button"
             className={classes.toggle}
