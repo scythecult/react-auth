@@ -1,8 +1,14 @@
 import { useState } from "react";
+import { useHttp } from "../../hooks/hooks";
 
 import classes from "./AuthForm.module.css";
+const SECRET_TOKEN_URL = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?";
 
 const AuthForm = () => {
+  const [createUser, { isLoading }] = useHttp({
+    url: SECRET_TOKEN_URL,
+    method: "POST",
+  });
   const [emailValue, setEmailValue] = useState("");
   const [passValue, setPassValue] = useState("");
   const [isLogin, setIsLogin] = useState(true);
@@ -19,28 +25,14 @@ const AuthForm = () => {
       console.log("login existing user by comparing email/pass");
     } else {
       console.log("creates new user");
-    }
-
-    fetch("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=", {
-      method: "POST",
-      body: JSON.stringify({
+      createUser({
         email: emailValue,
         password: passValue,
         returnSecureToken: true,
-      }),
-      headers: {
-        "Content-type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((response) => {
-        console.log(response);
-        if (response?.error) {
-          const { message } = response.error;
-
-          setMessage(message);
-        }
+      }).then((errorData) => {
+        setMessage(errorData?.message);
       });
+    }
   };
 
   return (
@@ -69,7 +61,8 @@ const AuthForm = () => {
           {<p style={{ color: "white", marginTop: "4px" }}>{message}</p>}
         </div>
         <div className={classes.actions}>
-          <button>{isLogin ? "Login" : "Create Account"}</button>
+          {!isLoading && <button>{isLogin ? "Login" : "Create Account"}</button>}
+          {isLoading && <p>Sending request...</p>}
           <button
             type="button"
             className={classes.toggle}

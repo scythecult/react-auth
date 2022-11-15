@@ -1,45 +1,52 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const useHttp = ({ url, method = "GET" }) => {
   const [postResponse, setPostResponse] = useState(null);
-  const [isError, setIsError] = useState(null);
+  const [errorData, setErrorData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchData = async (items) => {
-    setIsError(false);
-    setIsLoading(true);
+  const fetchData = useCallback(
+    async (items) => {
+      setErrorData(null);
+      setIsLoading(true);
 
-    try {
-      const response = await fetch(
-        url,
-        method === "POST" || "PUT"
-          ? {
-              method,
-              body: JSON.stringify(items),
-              headers: {
-                "Content-type": "application/json",
-              },
-            }
-          : {}
-      );
+      try {
+        const response = await fetch(
+          url,
+          method === "POST" || "PUT"
+            ? {
+                method: method,
+                body: JSON.stringify(items),
+                headers: {
+                  "Content-type": "application/json",
+                },
+              }
+            : {}
+        );
 
-      if (response.ok) {
-        const data = await response.json();
+        if (response.ok) {
+          const data = await response.json();
 
-        if (method === "POST" || "PUT") {
-          setPostResponse(data);
+          if (method === "POST" || "PUT") {
+            setPostResponse(data);
+          }
+
+          return data;
         }
 
-        return data;
-      }
-    } catch {
-      setIsError(true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        const errorData = await response.json();
 
-  return [fetchData, { postResponse, isError, isLoading }];
+        setErrorData(errorData?.error);
+
+        return errorData?.error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [url, method]
+  );
+
+  return [fetchData, { postResponse, errorData, isLoading }];
 };
 
 export { useHttp };
