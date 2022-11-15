@@ -3,7 +3,10 @@ import { useState } from "react";
 import classes from "./AuthForm.module.css";
 
 const AuthForm = () => {
+  const [emailValue, setEmailValue] = useState("");
+  const [passValue, setPassValue] = useState("");
   const [isLogin, setIsLogin] = useState(true);
+  const [message, setMessage] = useState(false);
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -12,11 +15,17 @@ const AuthForm = () => {
   const onSubmit = (evt) => {
     evt.preventDefault();
 
-    fetch("https://identitytoolkit.googleapis.com/v1/accounts:signUp?", {
+    if (isLogin) {
+      console.log("login existing user by comparing email/pass");
+    } else {
+      console.log("creates new user");
+    }
+
+    fetch("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=", {
       method: "POST",
       body: JSON.stringify({
-        email: "test@gmail.ru",
-        password: "doneOrNot",
+        email: emailValue,
+        password: passValue,
         returnSecureToken: true,
       }),
       headers: {
@@ -24,7 +33,14 @@ const AuthForm = () => {
       },
     })
       .then((res) => res.json())
-      .then((response) => console.log(response));
+      .then((response) => {
+        console.log(response);
+        if (response?.error) {
+          const { message } = response.error;
+
+          setMessage(message);
+        }
+      });
   };
 
   return (
@@ -33,11 +49,24 @@ const AuthForm = () => {
       <form onSubmit={onSubmit}>
         <div className={classes.control}>
           <label htmlFor="email">Your Email</label>
-          <input type="email" id="email" required />
+          <input
+            value={emailValue}
+            type="email"
+            id="email"
+            required
+            onChange={(evt) => setEmailValue(evt.target.value.trim())}
+          />
         </div>
         <div className={classes.control}>
           <label htmlFor="password">Your Password</label>
-          <input type="password" id="password" required />
+          <input
+            value={passValue}
+            type="password"
+            id="password"
+            required
+            onChange={(evt) => setPassValue(evt.target.value.trim())}
+          />
+          {<p style={{ color: "white", marginTop: "4px" }}>{message}</p>}
         </div>
         <div className={classes.actions}>
           <button>{isLogin ? "Login" : "Create Account"}</button>
