@@ -1,11 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useHttp } from "../../hooks/hooks";
 import { Message } from "../message/message";
 
 import classes from "./AuthForm.module.css";
-const SIGN_UP_URL = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=";
-const SIGN_IN_URL =
-  "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=";
 
 const AuthForm = () => {
   const [createUser, { isLoading: createUserLoading }] = useHttp({
@@ -20,7 +17,8 @@ const AuthForm = () => {
   const [passValue, setPassValue] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [message, setMessage] = useState("");
-  const [wasSended, setWasSended] = useState(false);
+
+  const wasSended = createUserLoading || loginLoading;
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -29,30 +27,24 @@ const AuthForm = () => {
   const onSubmit = (evt) => {
     evt.preventDefault();
 
+    const userData = { email: emailValue, password: passValue, returnSecureToken: true };
+
     if (isLogin) {
       console.log("login existing user by comparing email/pass");
-      loginUser({ email: emailValue, password: passValue, returnSecureToken: true }).then(
-        (response) => {
-          console.log(response);
-          setMessage(response?.message);
-          setWasSended(false);
-        }
-      );
+      loginUser(userData).then((response) => {
+        console.log(response);
+        setMessage(response?.message);
+      });
     } else {
       console.log("creates new user");
-      createUser({
-        email: emailValue,
-        password: passValue,
-        returnSecureToken: true,
-      }).then((errorData) => {
+      createUser(userData).then((errorData) => {
         setMessage(errorData?.message);
-        setWasSended(false);
       });
     }
 
+    setMessage("");
     setEmailValue("");
     setPassValue("");
-    setWasSended(true);
   };
 
   return (

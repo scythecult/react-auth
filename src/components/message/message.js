@@ -20,14 +20,16 @@ const Message = ({ MESSAGE_CODE, wasSended }) => {
   // }, [MESSAGE_CODE]);
 
   useEffect(() => {
-    setIsVisible(true);
+    if (MESSAGE_CODE) {
+      setIsVisible(true);
+    }
 
     const timerId = setTimeout(() => {
       setIsVisible(false);
-    }, 1500);
+    }, 3000);
 
     return () => clearTimeout(timerId);
-  }, [wasSended]);
+  }, [wasSended, MESSAGE_CODE]);
 
   const messageClasses = isVisible
     ? classes.message
