@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useHttp } from "../../hooks/hooks";
 import { Message } from "../message/message";
 
