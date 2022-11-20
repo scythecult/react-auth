@@ -1,7 +1,7 @@
-import StartingPageContent from '../components/StartingPage/StartingPageContent';
+import { Outlet } from "react-router-dom";
 
 const HomePage = () => {
-  return <StartingPageContent />;
+  return <Outlet />;
 };
 
 export default HomePage;

@@ -10,7 +10,7 @@ const MainNavigation = () => {
 
   const onLogoutClick = () => {
     dispatch(logOut());
-    navigate("/auth");
+    navigate("/");
   };
 
   return (
@@ -22,12 +22,12 @@ const MainNavigation = () => {
         <ul>
           {!isLoggedIn && (
             <li>
-              <Link to="/auth">Login</Link>
+              <Link to="auth">Login</Link>
             </li>
           )}
           {isLoggedIn && (
             <li>
-              <Link to="/profile">Profile</Link>
+              <Link to="profile">Profile</Link>
             </li>
           )}
           {isLoggedIn && (

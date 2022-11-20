@@ -34,6 +34,8 @@ const ProfileForm = () => {
         }
       }
     );
+
+    setMessage("");
     setPassValue("");
   };
 
