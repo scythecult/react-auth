@@ -1,14 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import classes from "./MainNavigation.module.css";
 import { logOut } from "../../features/user-auth-slice";
 
 const MainNavigation = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { isLoggedIn } = useSelector((state) => state.userAuth);
 
   const onLogoutClick = () => {
     dispatch(logOut());
+    navigate("/auth");
   };
 
   return (

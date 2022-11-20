@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { logIn } from "../../features/user-auth-slice";
 import { useHttp } from "../../hooks/hooks";
 import { Message } from "../message/message";
@@ -8,20 +9,13 @@ import classes from "./AuthForm.module.css";
 
 const AuthForm = () => {
   const dispatch = useDispatch();
-  const [createUser, { isLoading: createUserLoading }] = useHttp({
-    url: SIGN_UP_URL,
-    method: "POST",
-  });
-  const [loginUser, { isLoading: loginLoading }] = useHttp({
-    url: SIGN_IN_URL,
-    method: "POST",
-  });
+  const navigate = useNavigate();
+
+  const [fetchData, { isLoading }] = useHttp();
   const [emailValue, setEmailValue] = useState("");
   const [passValue, setPassValue] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [message, setMessage] = useState("");
-
-  const wasSended = createUserLoading || loginLoading;
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -31,26 +25,16 @@ const AuthForm = () => {
     evt.preventDefault();
 
     const userData = { email: emailValue, password: passValue, returnSecureToken: true };
+    const requestUrl = isLogin ? SIGN_IN_URL : SIGN_UP_URL;
 
-    if (isLogin) {
-      console.log("login existing user by comparing email/pass");
-      loginUser(userData).then((response) => {
-        if (response?.errors?.length) {
-          setMessage(response?.message);
-        } else {
-          dispatch(logIn());
-        }
-      });
-    } else {
-      console.log("creates new user");
-      createUser(userData).then((response) => {
-        if (response?.errors?.length) {
-          setMessage(response?.message);
-        } else {
-          dispatch(logIn());
-        }
-      });
-    }
+    fetchData({ url: requestUrl, method: "POST", items: userData }).then((response) => {
+      if (response?.errors?.length) {
+        setMessage(response?.message);
+      } else {
+        dispatch(logIn());
+        navigate("/");
+      }
+    });
 
     setMessage("");
     setEmailValue("");
@@ -82,13 +66,11 @@ const AuthForm = () => {
           />
         </div>
         <div className={classes.control}>
-          <Message MESSAGE_CODE={message} wasSended={wasSended} />
+          <Message MESSAGE_CODE={message} wasSended={isLoading} />
         </div>
         <div className={classes.actions}>
-          {!createUserLoading && !loginLoading && (
-            <button>{isLogin ? "Login" : "Create Account"}</button>
-          )}
-          {(createUserLoading || loginLoading) && <p>Sending request...</p>}
+          {!isLoading && <button>{isLogin ? "Login" : "Create Account"}</button>}
+          {isLoading && <p>Sending request...</p>}
           <button
             type="button"
             className={classes.toggle}
