@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { logIn } from "../../features/user-auth-slice";
 import { useHttp } from "../../hooks/hooks";
 import { Message } from "../message/message";
 
 import classes from "./AuthForm.module.css";
 
 const AuthForm = () => {
+  const dispatch = useDispatch();
   const [createUser, { isLoading: createUserLoading }] = useHttp({
     url: SIGN_UP_URL,
     method: "POST",
@@ -32,13 +35,20 @@ const AuthForm = () => {
     if (isLogin) {
       console.log("login existing user by comparing email/pass");
       loginUser(userData).then((response) => {
-        console.log(response);
-        setMessage(response?.message);
+        if (response?.errors?.length) {
+          setMessage(response?.message);
+        } else {
+          dispatch(logIn());
+        }
       });
     } else {
       console.log("creates new user");
-      createUser(userData).then((errorData) => {
-        setMessage(errorData?.message);
+      createUser(userData).then((response) => {
+        if (response?.errors?.length) {
+          setMessage(response?.message);
+        } else {
+          dispatch(logIn());
+        }
       });
     }
 
