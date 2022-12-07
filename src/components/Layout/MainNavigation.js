@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import classes from "./MainNavigation.module.css";
 import { logOut } from "../../features/user-auth-slice";
+import { STORAGE_KEY } from "../../consts/consts";
 
 const MainNavigation = () => {
   const dispatch = useDispatch();
@@ -9,6 +10,12 @@ const MainNavigation = () => {
   const { isLoggedIn } = useSelector((state) => state.userAuth);
 
   const onLogoutClick = () => {
+    const savedUserToken = localStorage.getItem(STORAGE_KEY);
+
+    if (savedUserToken) {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
     dispatch(logOut());
     navigate("/");
   };

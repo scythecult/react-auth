@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { SIGN_IN_URL, SIGN_UP_URL } from "../../consts/consts";
+import { SIGN_IN_URL, SIGN_UP_URL, STORAGE_KEY } from "../../consts/consts";
 import { logIn } from "../../features/user-auth-slice";
 import { useHttp } from "../../hooks/hooks";
 import { Message } from "../message/message";
@@ -32,8 +32,12 @@ const AuthForm = () => {
       if (response?.errors?.length) {
         setMessage(response?.message);
       } else {
-        dispatch(logIn(response.idToken));
+        dispatch(logIn({ token: response.idToken, logIn: emailValue }));
         navigate("/");
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ token: response.idToken, login: emailValue })
+        );
       }
     });
 

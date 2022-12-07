@@ -29,7 +29,7 @@ const ProfileForm = () => {
         if (response?.errors?.length) {
           setMessage(response?.message);
         } else {
-          dispatch(logIn(response.idToken));
+          dispatch(logIn({ token: response.idToken }));
           navigate("/");
         }
       }
@@ -53,7 +53,7 @@ const ProfileForm = () => {
           type="password"
           id="new-password"
         />
-        <Message MESSAGE_CODE={message} wasSended={isLoading} />
+        <Message messageText={message} wasSended={isLoading} />
       </div>
       <div className={classes.action}>
         {!isLoading && <button>Change Password</button>}

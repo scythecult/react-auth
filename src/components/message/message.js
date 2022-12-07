@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import classes from "./message.module.css";
 
-const Message = ({ MESSAGE_CODE, wasSended }) => {
+const Message = ({ messageText, wasSended }) => {
   // const [message, setMessage] = useState("");
   const [isVisible, setIsVisible] = useState(false);
 
   // useEffect(() => {
-  //   switch (MESSAGE_CODE) {
+  //   switch (messageText) {
   //     case "MISSING_PASSWORD":
   //       setMessage("Password was missed, please return and type it");
   //       break;
@@ -17,10 +17,10 @@ const Message = ({ MESSAGE_CODE, wasSended }) => {
   //     default:
   //       return;
   //   }
-  // }, [MESSAGE_CODE]);
+  // }, [messageText]);
 
   useEffect(() => {
-    if (MESSAGE_CODE) {
+    if (messageText) {
       setIsVisible(true);
     }
 
@@ -29,13 +29,13 @@ const Message = ({ MESSAGE_CODE, wasSended }) => {
     }, 3000);
 
     return () => clearTimeout(timerId);
-  }, [wasSended, MESSAGE_CODE]);
+  }, [wasSended, messageText]);
 
   const messageClasses = isVisible
     ? classes.message
     : `${classes.message} ${classes.hidden}`;
 
-  return <p className={messageClasses}>{MESSAGE_CODE}</p>;
+  return <p className={messageClasses}>{messageText}</p>;
 };
 
 export { Message };
