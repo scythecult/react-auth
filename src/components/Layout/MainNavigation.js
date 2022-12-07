@@ -10,9 +10,9 @@ const MainNavigation = () => {
   const { isLoggedIn } = useSelector((state) => state.userAuth);
 
   const onLogoutClick = () => {
-    const savedUserToken = localStorage.getItem(STORAGE_KEY);
+    const userInfo = localStorage.getItem(STORAGE_KEY);
 
-    if (savedUserToken) {
+    if (userInfo) {
       localStorage.removeItem(STORAGE_KEY);
     }
 

@@ -32,7 +32,7 @@ const AuthForm = () => {
       if (response?.errors?.length) {
         setMessage(response?.message);
       } else {
-        dispatch(logIn({ token: response.idToken, logIn: emailValue }));
+        dispatch(logIn({ token: response.idToken, login: emailValue }));
         navigate("/");
         localStorage.setItem(
           STORAGE_KEY,
@@ -71,7 +71,7 @@ const AuthForm = () => {
           />
         </div>
         <div className={classes.control}>
-          <Message MESSAGE_CODE={message} wasSended={isLoading} />
+          <Message messageText={message} wasSended={isLoading} />
         </div>
         <div className={classes.actions}>
           {!isLoading && <button>{isLogin ? "Login" : "Create Account"}</button>}
