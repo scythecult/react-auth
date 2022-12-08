@@ -32,7 +32,13 @@ const AuthForm = () => {
       if (response?.errors?.length) {
         setMessage(response?.message);
       } else {
-        dispatch(logIn({ token: response.idToken, login: emailValue }));
+        dispatch(
+          logIn({
+            token: response.idToken,
+            login: emailValue,
+            expiresIn: +response.expiresIn,
+          })
+        );
         navigate("/");
         localStorage.setItem(
           STORAGE_KEY,

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const useHttp = () => {
   const [postResponse, setPostResponse] = useState(null);
@@ -46,4 +46,22 @@ const useHttp = () => {
   return [fetchData, { postResponse, errorData, isLoading }];
 };
 
-export { useHttp };
+const useCallbackAfter = ({ callback, seconds, isStartCount }) => {
+  const [isDone, setIsDone] = useState(false);
+
+  useEffect(() => {
+    if (isDone) return;
+    if (!isStartCount) return;
+
+    const timerId = setTimeout(() => {
+      callback();
+      setIsDone(true);
+    }, seconds * 1000);
+
+    return () => clearTimeout(timerId);
+  }, [isDone, callback, seconds, isStartCount]);
+
+  return [isDone];
+};
+
+export { useHttp, useCallbackAfter };

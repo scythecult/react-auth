@@ -9,6 +9,7 @@ const initialState = {
   isLoggedIn: userLogin && token,
   userLogin: userLogin,
   userToken: token,
+  expiresIn: 3600,
 };
 
 const userAuthSlice = createSlice({
@@ -19,11 +20,13 @@ const userAuthSlice = createSlice({
       state.isLoggedIn = true;
       state.userToken = action.payload.token;
       state.userLogin = action.payload.login;
+      state.expiresIn = action.payload.expiresIn;
     },
     logOut(state) {
       state.isLoggedIn = false;
       state.userToken = "";
       state.userLogin = "";
+      state.expiresIn = 3600;
     },
   },
 });
